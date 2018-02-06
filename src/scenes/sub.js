@@ -74,14 +74,14 @@ const scene = new WizardScene('sub',
         .then((file) => {
           Finance.create({ userId, type: 0, sum, category, fileId: file.id })
             .then(() => {
-              User.decrement({ balance: sum }, { where: { userId } })
+              User.increment({ balance: -sum }, { where: { userId } })
             })
         })
     } else if (ctx.callbackQuery) {
       const userId = ctx.callbackQuery.from.id
       Finance.create({ userId, type: 0, sum, category })
         .then(() => {
-          User.decrement({ balance: sum }, { where: { userId } })
+          User.increment({ balance: -sum }, { where: { userId } })
         })
     }
     ctx.reply('Done')

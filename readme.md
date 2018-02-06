@@ -1,3 +1,4 @@
+balance - Баланс
 add - Приход
 sub - Расход
 history - История
