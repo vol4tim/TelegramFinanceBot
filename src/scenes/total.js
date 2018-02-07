@@ -3,13 +3,14 @@ import Scene from 'telegraf/scenes/base'
 import Finance from '../models/finance'
 
 const getTotal = (where) => {
-  return Finance.sum('sum', { where })
+  return Finance.sum('sum', { where }).then((r) => r || 0)
 }
 
 const scene = new Scene('total')
 scene.enter((ctx) => {
   return ctx.reply('Укажите категорию',
     Telegraf.Markup.inlineKeyboard([
+      Telegraf.Markup.switchToCurrentChatButton('Выбрать категорию', ''),
       Telegraf.Markup.callbackButton('Все категории', 'ALL'),
     ]).extra()
   );

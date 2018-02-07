@@ -36,6 +36,7 @@ const scene = new Scene('history')
 scene.enter((ctx) => {
   return ctx.reply('Укажите категорию',
     Telegraf.Markup.inlineKeyboard([
+      Telegraf.Markup.switchToCurrentChatButton('Выбрать категорию', ''),
       Telegraf.Markup.callbackButton('Все категории', 'ALL'),
     ]).extra()
   );

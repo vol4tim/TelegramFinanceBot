@@ -4,6 +4,8 @@ import bot from './bot'
 import db from './models/db'
 import scenes from './scenes'
 import User from './models/user'
+import _ from 'lodash'
+import Finance from './models/finance'
 
 const runApp = () => {
   // bot.use(Telegraf.log())
@@ -38,6 +40,50 @@ const runApp = () => {
 
   bot.hears('Приход', ctx => ctx.scene.enter('add'));
   bot.hears('Расход', ctx => ctx.scene.enter('sub'));
+
+  function getCategory(ctx) {
+    if (!ctx.inlineQuery.query) {
+      return ctx.answerInlineQuery([{
+        type: 'article',
+        title: 'Начните вводить название...',
+        id: ctx.inlineQuery.id,
+        input_message_content: {
+          message_text: 'Начните вводить название...',
+        },
+      }]);
+    }
+
+    const query = ctx.inlineQuery.query
+    const where = {
+      userId: ctx.inlineQuery.from.id,
+      category: {
+        [db.Sequelize.Op.like]: query +'%'
+      }
+    }
+
+    return Finance.findAll({ where })
+      .then((rows) => {
+        const res = []
+        _.forEach(rows, (row) => {
+          res.push({
+            type: 'article',
+            id: String(row.id),
+            title: row.category,
+            input_message_content: {
+              message_text: row.category
+            },
+          })
+        })
+        return res
+      })
+      .then((res) => {
+        ctx.answerInlineQuery(res);
+      })
+  }
+
+  bot.on('inline_query', (ctx) => {
+    return getCategory(ctx);
+  });
 }
 
 db.sequelize.sync()
