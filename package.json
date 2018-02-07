@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "bluebird": "^3.5.1",
+    "json2csv": "^3.11.5",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
     "sequelize": "^4.32.1",

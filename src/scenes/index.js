@@ -5,6 +5,7 @@ import sub from './sub'
 import history from './history'
 import total from './total'
 import remove from './remove'
+import csv from './csv'
 
 const stage = new Stage()
 
@@ -14,5 +15,6 @@ stage.register(sub)
 stage.register(history)
 stage.register(total)
 stage.register(remove)
+stage.register(csv)
 
 export default stage.middleware()

@@ -24,7 +24,11 @@ const getTable = (where) => {
       _.forEach(groups, (group, groupName) => {
         message += "Категория: " + groupName + " | Сумма расходов: " + group.sum + "\n----------------\n"
         _.forEach(group.list, (row) => {
-          message += "ID: " + row.id + " | Тип: " + ((row.type == 1) ? "приход" : "расход") + " | Сумма: " + row.sum + " | Дата: " + moment(new Date(row.createdAt)).format("DD.MM.YYYY HH:mm") + "\n"
+          message += "ID: " + row.id
+            + " | Тип: " + ((row.type == 1) ? "приход" : "расход")
+            + " | Сумма: " + row.sum
+            + " | Дата: " + moment(new Date(row.createdAt)).format("DD.MM.YYYY HH:mm")
+            + " | Ком: " + row.comment + "\n"
         })
         message += "\n"
       })

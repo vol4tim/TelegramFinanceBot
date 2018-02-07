@@ -18,6 +18,7 @@ const runApp = () => {
   bot.command('history', (ctx) => ctx.scene.enter('history'))
   bot.command('total', (ctx) => ctx.scene.enter('total'))
   bot.command('remove', (ctx) => ctx.scene.enter('remove'))
+  bot.command('csv', (ctx) => ctx.scene.enter('csv'))
 
   bot.action('CANCEL', (ctx) => {
     ctx.scene.leave();

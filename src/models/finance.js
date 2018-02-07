@@ -12,6 +12,10 @@ const Finance = db.sequelize.define('finance', {
     type: db.Sequelize.STRING,
     defaultValue: ''
   },
+  comment: {
+    type: db.Sequelize.STRING,
+    defaultValue: ''
+  },
   type: {
     type: db.Sequelize.INTEGER,
     defaultValue: 0

@@ -30,7 +30,8 @@ const fileDownload = (url) => {
 const scene = new WizardScene('add',
   (ctx) => {
     ctx.scene.state.sum = 0
-    ctx.scene.state.cat = ''
+    ctx.scene.state.category = ''
+    ctx.scene.state.comment = ''
     ctx.scene.state.img = ''
     ctx.reply('Укажите сумму прихода',
       Telegraf.Markup.inlineKeyboard([
@@ -45,6 +46,7 @@ const scene = new WizardScene('add',
     }
     ctx.reply('Укажите категорию',
       Telegraf.Markup.inlineKeyboard([
+        Telegraf.Markup.callbackButton('Пропустить', 'NEXT'),
         Telegraf.Markup.callbackButton('Cancel', 'CANCEL'),
       ]).extra()
     );
@@ -53,6 +55,18 @@ const scene = new WizardScene('add',
   (ctx) => {
     if (ctx.message) {
       ctx.scene.state.category = ctx.message.text
+    }
+    ctx.reply('Укажите комментарий',
+      Telegraf.Markup.inlineKeyboard([
+        Telegraf.Markup.callbackButton('Пропустить', 'NEXT'),
+        Telegraf.Markup.callbackButton('Cancel', 'CANCEL'),
+      ]).extra()
+    );
+    return ctx.wizard.next()
+  },
+  (ctx) => {
+    if (ctx.message) {
+      ctx.scene.state.comment = ctx.message.text
     }
     ctx.reply('Приложите фото чека',
       Telegraf.Markup.inlineKeyboard([
@@ -63,7 +77,7 @@ const scene = new WizardScene('add',
     return ctx.wizard.next()
   },
   (ctx) => {
-    const { sum, category } = ctx.scene.state
+    const { sum, category, comment } = ctx.scene.state
     if (ctx.message) {
       const userId = ctx.message.from.id
       ctx.telegram.getFileLink( ctx.message.photo[ctx.message.photo.length-1].file_id )
@@ -72,14 +86,14 @@ const scene = new WizardScene('add',
           return Files.create({ userId, messageId: ctx.message.message_id, file: path.basename(file) })
         })
         .then((file) => {
-          Finance.create({ userId, type: 1, sum, category, fileId: file.id })
+          Finance.create({ userId, type: 1, sum, category, comment, fileId: file.id })
             .then(() => {
               User.increment({ balance: sum }, { where: { userId } })
             })
         })
     } else if (ctx.callbackQuery) {
       const userId = ctx.callbackQuery.from.id
-      Finance.create({ userId, type: 1, sum, category })
+      Finance.create({ userId, type: 1, sum, category, comment })
         .then(() => {
           User.increment({ balance: sum }, { where: { userId } })
         })
