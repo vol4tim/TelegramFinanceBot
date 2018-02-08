@@ -80,10 +80,11 @@ const scene = new WizardScene('add',
     const { sum, category, comment } = ctx.scene.state
     if (ctx.message) {
       const userId = ctx.message.from.id
-      ctx.telegram.getFileLink( ctx.message.photo[ctx.message.photo.length-1].file_id )
+      const tFileId = ctx.message.photo[ctx.message.photo.length-1].file_id
+      ctx.telegram.getFileLink(tFileId)
         .then((link) => fileDownload(link))
         .then((file) => {
-          return Files.create({ userId, messageId: ctx.message.message_id, file: path.basename(file) })
+          return Files.create({ userId, messageId: ctx.message.message_id, tFileId, file: path.basename(file) })
         })
         .then((file) => {
           Finance.create({ userId, type: 1, sum, category, comment, fileId: file.id })

@@ -1,4 +1,5 @@
 import db from './db'
+import Files from './files'
 
 const Finance = db.sequelize.define('finance', {
   userId: {
@@ -25,5 +26,6 @@ const Finance = db.sequelize.define('finance', {
     defaultValue: 0
   }
 })
+Finance.belongsTo(Files, {foreignKey: 'fileId'});
 
 export default Finance

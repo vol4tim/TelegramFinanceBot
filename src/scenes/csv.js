@@ -1,24 +1,46 @@
 import Scene from 'telegraf/scenes/base'
+import Promise from 'bluebird'
 import _ from 'lodash'
 import moment from 'moment'
 import fs from 'fs'
 import json2csv from 'json2csv'
 import Finance from '../models/finance'
+import Files from '../models/files'
 import { PATH_FILES } from '../config'
 
-const getHistory = (where) => {
-  return Finance.findAll({ where })
+const getHistory = (ctx, where) => {
+  const include = [{
+    model: Files,
+    as: 'file'
+  }]
+  const data = []
+  return Finance.findAll({ include, where })
     .then((rows) => {
-      const data = []
       _.forEach(rows, (row) => {
+        const file = (row.file) ? row.file.tFileId : ''
         data.push({
           id: row.id,
           type: ((row.type == 1) ? "приход" : "расход"),
           sum: row.sum,
           category: row.category,
           date: moment(new Date(row.createdAt)).format("DD.MM.YYYY HH:mm"),
-          com: row.comment
+          com: row.comment,
+          file
         })
+      })
+      const filesPromises = []
+      _.forEach(data, (row) => {
+        if (row.file) {
+          filesPromises.push(ctx.telegram.getFileLink(row.file))
+        } else {
+          filesPromises.push(Promise.resolve(''))
+        }
+      })
+      return Promise.all(filesPromises)
+    })
+    .then((files) => {
+      _.forEach(files, (file, i) => {
+        data[i].file = file
       })
       return data
     })
@@ -29,9 +51,9 @@ scene.enter((ctx) => {
   const where = {
     userId: ctx.message.from.id
   }
-  return getHistory(where)
+  return getHistory(ctx, where)
     .then((result) => {
-      const fields = ['id', 'type', 'sum', 'category', 'date', 'com'];
+      const fields = ['id', 'type', 'sum', 'category', 'date', 'com', 'file'];
       const csv = json2csv({ data: result, fields: fields });
       fs.writeFile(PATH_FILES + '/tmp.csv', csv, function(err) {
         if (err) throw err;

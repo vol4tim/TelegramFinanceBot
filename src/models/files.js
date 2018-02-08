@@ -7,6 +7,9 @@ const Files = db.sequelize.define('files', {
   messageId: {
     type: db.Sequelize.INTEGER
   },
+  tFileId: {
+    type: db.Sequelize.STRING
+  },
   file: {
     type: db.Sequelize.STRING
   }
