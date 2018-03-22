@@ -6,6 +6,7 @@ import scenes from './scenes'
 import User from './models/user'
 import _ from 'lodash'
 import Finance from './models/finance'
+import docSync from './doc'
 
 const runApp = () => {
   // bot.use(Telegraf.log())
@@ -20,6 +21,7 @@ const runApp = () => {
   bot.command('total', (ctx) => ctx.scene.enter('total'))
   bot.command('remove', (ctx) => ctx.scene.enter('remove'))
   bot.command('csv', (ctx) => ctx.scene.enter('csv'))
+  bot.command('sync', (ctx) => ctx.scene.enter('sync'))
 
   bot.action('CANCEL', (ctx) => {
     ctx.scene.leave();
@@ -67,6 +69,9 @@ const runApp = () => {
       .then((rows) => {
         const res = []
         _.forEach(rows, (row) => {
+          if (_.find(res, { title: row.category })) {
+            return
+          }
           res.push({
             type: 'article',
             id: String(row.id),
@@ -90,8 +95,11 @@ const runApp = () => {
 
 db.sequelize.sync()
   .then(() => {
-    runApp()
-    bot.startPolling()
+    docSync()
+      .then(() => {
+        runApp()
+        bot.startPolling()
+      })
   })
   .catch((e) => {
     console.log(e);

@@ -17,7 +17,7 @@ scene.on('text', (ctx) => {
       if (row !== null) {
         const message = "ID: " + row.id + "\n"
           + "Тип: " + ((row.type == 1) ? "приход" : "расход") + "\n"
-          + "Сумма: " + row.sum + "\n"
+          + "Сумма: " + row.sum +  '' + row.currency + "\n"
           + "Дата: " + moment(new Date(row.createdAt)).format("DD.MM.YYYY HH:mm") + "\n"
           + ((row.comment) ? "Комментарий: " + row.comment : "")
         ctx.reply(message);

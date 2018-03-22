@@ -12,21 +12,21 @@ const getTable = (where) => {
       _.forEach(rows, (row) => {
         if (!_.has(groups, row.category)) {
           groups[row.category] = {
-            sum: 0,
+            // sum: 0,
             list: []
           }
         }
         groups[row.category].list.push(row)
-        if (row.type == 0) {
-          groups[row.category].sum += row.sum
-        }
+        // if (row.type == 0) {
+        //   groups[row.category].sum += row.sum
+        // }
       })
       _.forEach(groups, (group, groupName) => {
-        message += "Категория: " + groupName + " | Сумма расходов: " + group.sum + "\n----------------\n"
+        message += "Категория: " + groupName + "\n----------------\n"
         _.forEach(group.list, (row) => {
           message += "ID: " + row.id
             + " | Тип: " + ((row.type == 1) ? "приход" : "расход")
-            + " | Сумма: " + row.sum
+            + " | Сумма: " + row.sum + ' ' + row.currency
             + " | Дата: " + moment(new Date(row.createdAt)).format("DD.MM.YYYY HH:mm")
             + " | Ком: " + row.comment + "\n"
         })

@@ -6,8 +6,12 @@ const Finance = db.sequelize.define('finance', {
     type: db.Sequelize.STRING
   },
   sum: {
-    type: db.Sequelize.INTEGER,
+    type: db.Sequelize.FLOAT,
     defaultValue: 0
+  },
+  currency: {
+    type: db.Sequelize.STRING,
+    defaultValue: 'RUB'
   },
   category: {
     type: db.Sequelize.STRING,

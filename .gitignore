@@ -5,3 +5,4 @@ npm-debug.log*
 !/dist/.gitkeep
 /files
 !/files/img/.gitkeep
+/src/doc/client_secret.json

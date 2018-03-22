@@ -1,6 +1,5 @@
 import Scene from 'telegraf/scenes/base'
-import Finance from '../models/finance'
-import User from '../models/user'
+import { financeDel } from '../utils'
 
 const scene = new Scene('remove')
 scene.enter((ctx) => {
@@ -10,24 +9,11 @@ scene.enter((ctx) => {
 scene.on('text', (ctx) => {
   const id = ctx.message.text;
   const userId = ctx.message.from.id
-  let entity
   ctx.scene.leave()
-  return Finance.findOne({ where: { userId, id } })
-    .then((row) => {
-      if (row !== null) {
-        entity = row
-        return Finance.destroy({ where: { userId, id } })
-      }
-      return false
-    })
+  return financeDel(userId, id)
     .then((count) => {
       if (count === 1) {
         ctx.reply('Запись удалена');
-        if (entity.type == 1) {
-          User.increment({ balance: -entity.sum }, { where: { userId } })
-        } else {
-          User.increment({ balance: entity.sum }, { where: { userId } })
-        }
       }
     })
     .catch((e) => {

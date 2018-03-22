@@ -5,6 +5,7 @@ const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: PATH_DB,
   logging: false
+  // logging: console.log
 });
 
 const db = {}

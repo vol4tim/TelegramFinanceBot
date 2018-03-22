@@ -22,6 +22,7 @@ const getHistory = (ctx, where) => {
           id: row.id,
           type: ((row.type == 1) ? "приход" : "расход"),
           sum: row.sum,
+          currency: row.currency,
           category: row.category,
           date: moment(new Date(row.createdAt)).format("DD.MM.YYYY HH:mm"),
           com: row.comment,
@@ -53,7 +54,7 @@ scene.enter((ctx) => {
   }
   return getHistory(ctx, where)
     .then((result) => {
-      const fields = ['id', 'type', 'sum', 'category', 'date', 'com', 'file'];
+      const fields = ['id', 'type', 'sum', 'currency', 'category', 'date', 'com', 'file'];
       const csv = json2csv({ data: result, fields: fields });
       fs.writeFile(PATH_FILES + '/tmp.csv', csv, function(err) {
         if (err) throw err;

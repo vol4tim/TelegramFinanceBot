@@ -5,9 +5,8 @@ import Telegraf from 'telegraf'
 import WizardScene from 'telegraf/scenes/wizard'
 import Promise from 'bluebird'
 import { PATH_IMG } from '../config'
-import Finance from '../models/finance'
 import Files from '../models/files'
-import User from '../models/user'
+import { financeAdd } from '../utils'
 
 const fileDownload = (url) => {
   return new Promise((resolve, reject) => {
@@ -42,7 +41,9 @@ const scene = new WizardScene('sub',
   },
   (ctx) => {
     if (ctx.message) {
-      ctx.scene.state.sum = Number(ctx.message.text)
+      const result = ctx.message.text.split(' ')
+      ctx.scene.state.sum = Number(result[0])
+      ctx.scene.state.currency = (result.length > 1) ? result[1].toUpperCase() : 'RUB'
     }
     ctx.reply('Укажите категорию',
       Telegraf.Markup.inlineKeyboard([
@@ -77,7 +78,7 @@ const scene = new WizardScene('sub',
     return ctx.wizard.next()
   },
   (ctx) => {
-    const { sum, category, comment } = ctx.scene.state
+    const { sum, currency, category, comment } = ctx.scene.state
     if (ctx.message) {
       const userId = ctx.message.from.id
       ctx.telegram.getFileLink( ctx.message.photo[ctx.message.photo.length-1].file_id )
@@ -86,17 +87,11 @@ const scene = new WizardScene('sub',
           return Files.create({ userId, messageId: ctx.message.message_id, file: path.basename(file) })
         })
         .then((file) => {
-          Finance.create({ userId, type: 0, sum, category, comment, fileId: file.id })
-            .then(() => {
-              User.increment({ balance: -sum }, { where: { userId } })
-            })
+          financeAdd(userId, 0, sum, currency, category, comment, file.id)
         })
     } else if (ctx.callbackQuery) {
       const userId = ctx.callbackQuery.from.id
-      Finance.create({ userId, type: 0, sum, category, comment })
-        .then(() => {
-          User.increment({ balance: -sum }, { where: { userId } })
-        })
+      financeAdd(userId, 0, sum, currency, category, comment, null)
     }
     ctx.reply('Done')
     return ctx.scene.leave()

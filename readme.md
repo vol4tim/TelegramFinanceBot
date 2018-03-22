@@ -1,9 +1,9 @@
 balance - Баланс
 add - Приход
 sub - Расход
+view - Просмотр записи
 history - История
 total - Итог
 remove - Удаление записи
 csv - Csv документ истории
-
-pm2 start pm2.json --only "finance-bot-local"
+sync - Синхронизация бота с гугл таблицей
