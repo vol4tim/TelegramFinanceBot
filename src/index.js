@@ -6,7 +6,7 @@ import scenes from './scenes'
 import User from './models/user'
 import _ from 'lodash'
 import Finance from './models/finance'
-import docSync from './doc'
+import docSync, { addList, getListByName } from './doc'
 
 const runApp = () => {
   // bot.use(Telegraf.log())
@@ -23,11 +23,6 @@ const runApp = () => {
   bot.command('csv', (ctx) => ctx.scene.enter('csv'))
   bot.command('sync', (ctx) => ctx.scene.enter('sync'))
 
-  bot.action('CANCEL', (ctx) => {
-    ctx.scene.leave();
-    ctx.editMessageText('Canceled');
-  });
-
   const GLOBAL_KEYBOARD = Telegraf.Markup.keyboard([['Приход', 'Расход']]).resize().extra();
 
   bot.start((ctx) => {
@@ -35,6 +30,16 @@ const runApp = () => {
       .then((user) => {
         if (user === null) {
           User.create({ userId: ctx.from.id, username: ctx.from.username })
+          getListByName(ctx.from.username)
+            .then((list) => {
+              if (_.isEmpty(list)) {
+                return addList(ctx.from.username)
+              }
+              return false
+            })
+            .catch((e) => {
+              console.log(e);
+            })
           return null
         }
         return user

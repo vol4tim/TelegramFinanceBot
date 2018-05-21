@@ -46,7 +46,8 @@ scene.enter((ctx) => {
   );
 });
 
-scene.on('text', (ctx) => {
+scene.hears(/^(?!\/).*?/gi, (ctx) => {
+// scene.on('text', (ctx) => {
   const where = {
     userId: ctx.message.from.id,
     category: ctx.message.text
@@ -64,5 +65,10 @@ scene.action('ALL', (ctx) => {
   return getTable(where)
     .then((result) => ctx.reply(result))
 });
+
+scene.command('cancel', (ctx) => {
+  ctx.reply('Canceled');
+  return ctx.scene.leave()
+})
 
 export default scene

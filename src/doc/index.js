@@ -18,6 +18,20 @@ const docSync = () => {
   })
 }
 
+export const addList = (name) => {
+  return new Promise((resolve, reject) => {
+    doc.addWorksheet({
+      title: name,
+      headers: ['Когда', 'Тип', 'Приход', 'Расход', 'Статья', 'Комментарий'],
+    }, (err) => {
+      if (err) {
+        reject(err)
+      }
+      resolve(true)
+    })
+  })
+}
+
 export const getListByName = (name) => {
   return new Promise((resolve, reject) => {
     doc.getInfo((err, info) => {

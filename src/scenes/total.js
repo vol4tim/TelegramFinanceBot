@@ -13,7 +13,6 @@ const scene = new WizardScene('total',
     ctx.reply('Укажите валюту',
       Telegraf.Markup.inlineKeyboard([
         Telegraf.Markup.callbackButton('Пропустить', 'NEXT'),
-        Telegraf.Markup.callbackButton('Cancel', 'CANCEL'),
       ]).extra()
     );
     return ctx.wizard.next()
@@ -54,8 +53,9 @@ const scene = new WizardScene('total',
 scene.action('NEXT', (ctx) => {
   return ctx.wizard.steps[ctx.wizard.cursor](ctx)
 })
-scene.action('CANCEL', (ctx) => {
-  ctx.editMessageText('Canceled');
+
+scene.command('cancel', (ctx) => {
+  ctx.reply('Canceled');
   return ctx.scene.leave()
 })
 

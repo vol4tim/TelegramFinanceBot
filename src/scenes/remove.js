@@ -6,7 +6,7 @@ scene.enter((ctx) => {
   ctx.reply('Укажите id удаляемой записи');
 });
 
-scene.on('text', (ctx) => {
+scene.hears(/^\d+$/gi, (ctx) => {
   const id = ctx.message.text;
   const userId = ctx.message.from.id
   ctx.scene.leave()
@@ -21,5 +21,10 @@ scene.on('text', (ctx) => {
       console.log(e);
     })
 });
+
+scene.command('cancel', (ctx) => {
+  ctx.reply('Canceled');
+  return ctx.scene.leave()
+})
 
 export default scene

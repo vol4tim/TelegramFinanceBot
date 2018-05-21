@@ -1,44 +1,35 @@
-import Telegraf from 'telegraf'
-import WizardScene from 'telegraf/scenes/wizard'
+import Scene from 'telegraf/scenes/base'
 import Finance from '../models/finance'
+import db from '../models/db'
 
-const scene = new WizardScene('balance',
-  (ctx) => {
-    ctx.reply('Укажите валюту',
-      Telegraf.Markup.inlineKeyboard([
-        Telegraf.Markup.callbackButton('Пропустить', 'NEXT'),
-        Telegraf.Markup.callbackButton('Cancel', 'CANCEL'),
-      ]).extra()
-    );
-    return ctx.wizard.next()
-  },
-  (ctx) => {
-    let currency = 'RUB'
-    if (ctx.message) {
-      currency = ctx.message.text.toUpperCase()
-    }
-    let add = 0
-    let sub = 0
-    Finance.sum('sum', { where: { userId: ctx.from.id, currency, type: 1 } })
-      .then((r) => r || 0)
-      .then((r) => {
-        add = r
-        return Finance.sum('sum', { where: { userId: ctx.from.id, currency, type: 0 } })
+const scene = new Scene('balance')
+scene.enter((ctx) => {
+  let adds = 0
+  Finance.findAll({
+    attributes: [[db.Sequelize.fn('SUM', db.Sequelize.col('sum')), 'sum'], 'currency'],
+    where: { userId: ctx.from.id, type: 1 },
+    group: ['currency']
+  })
+    .then((rows) => {
+      adds = rows
+      return Finance.findAll({
+        attributes: [[db.Sequelize.fn('SUM', db.Sequelize.col('sum')), 'sum'], 'currency'],
+        where: { userId: ctx.from.id, type: 0 },
+        group: ['currency']
       })
-      .then((r) => r || 0)
-      .then((r) => {
-        sub = r
-        ctx.reply('Ваш баланс: ' + (add - sub).toFixed(2) + ' ' + currency)
+    })
+    .then((rows) => {
+      const msg = ['Ваш баланс:']
+      adds.forEach((add) => {
+        rows.forEach((sub) => {
+          if (sub.currency === add.currency) {
+            msg.push((add.sum - sub.sum).toFixed(2) + ' ' + add.currency)
+          }
+        })
       })
-    return ctx.scene.leave()
-  }
-)
-scene.action('NEXT', (ctx) => {
-  return ctx.wizard.steps[ctx.wizard.cursor](ctx)
-})
-scene.action('CANCEL', (ctx) => {
-  ctx.editMessageText('Canceled');
+      ctx.reply(msg.join("\n"))
+    })
   return ctx.scene.leave()
-})
+});
 
 export default scene

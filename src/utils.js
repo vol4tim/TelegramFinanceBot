@@ -179,6 +179,7 @@ export const syncUser = (userId) => {
           currency: data['currency'],
           category: data['category'],
           comment: data['comment'],
+          createdAt: data['createdAt'],
         } }))
       })
       return Promise.all(ps)
